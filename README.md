@@ -1,26 +1,40 @@
-# Retail Sales Analysis SQL Project
+# Music Store Sales Analysis SQL Project
 
 ## Project Overview
 
-**Project Title**: Retail Sales Analysis  
+**Project Title**: Music Store Analysis  
 **Tool**: MySQL Workbench  
-**Database**: `sql_project_p1`
+**Database**: `sql_music_store_p2`
 
-This project is designed to demonstrate SQL skills and techniques typically used by data analysts to explore, clean, and analyze retail sales data. The project involves setting up a retail sales database, performing exploratory data analysis (EDA), extracting meaningful business insights and answering specific business questions through SQL queries.
+This project is designed to demonstrate advanced SQL skills and techniques typically used by data analysts to explore, clean, and analyze music store sales data. The project involves setting up a music store database with multiple related tables, performing complex joins, using window functions, and answering specific business questions through SQL queries.
 
 ## Objectives
 
-1. **Set up a retail sales database**: Create and populate a retail sales database with the provided sales data.
-2. **Data Cleaning**: Identify and remove any records with missing or null values.
-3. **Exploratory Data Analysis (EDA)**: Perform basic exploratory data analysis to understand the dataset.
-4. **Business Analysis**: Use SQL to answer specific business questions and derive insights from the sales data.
+1. **Set up a music store database**: Create and populate a comprehensive music store database with multiple related tables including artists, album, tracks, customers, invoices and employees.
+2. **Exploratory Data Analysis (EDA)**: Explore the relationships between different tables and understand the data structure
+3. **Complex Query Analysis**: Perform advanced SQL operations including JOINs, CTEs, window functions and subqueries
+4. **Business Analysis**: Use SQL to answer specific business questions and derive insights from the music store sales data.
 
 ## Project Structure
 
 ### 1. Database Setup
 
 - **Database Creation**: The project starts by creating a database named `sql_project_p1`.
+- **Data Import Process**: 12 CSV Files containing music store data were imported using MySQL Workbench's Table Data Import Wizard
 - **Table Creation**: A table named `retail_sales` is created to store the sales data. The table structure includes columns for transaction ID, sale date, sale time, customer ID, gender, age, product category, quantity sold, price per unit, cost of goods sold (COGS), and total sale amount.
+- **Final Database Schema**:
+The database contains 12 interconnected tables - 
+customer - Customer information and demographics
+invoice - Sales transaction records
+invoice_line - Individual items in each transaction
+track - Music track details
+album - Album information
+artist - Artist details
+genre - Music genre classification
+employee - Employee hierarchy and information
+media_type - Audio format types
+playlist & playlist_track - Playlist management
+Additional supporting tables
 
 ```sql
 CREATE DATABASE sql_project_p1;
