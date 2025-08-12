@@ -24,17 +24,17 @@ This project is designed to demonstrate advanced SQL skills and techniques typic
 - **Table Creation**: A table named `retail_sales` is created to store the sales data. The table structure includes columns for transaction ID, sale date, sale time, customer ID, gender, age, product category, quantity sold, price per unit, cost of goods sold (COGS), and total sale amount.
 - **Final Database Schema**:
 The database contains 12 interconnected tables - 
-customer - Customer information and demographics
-invoice - Sales transaction records
-invoice_line - Individual items in each transaction
-track - Music track details
-album - Album information
-artist - Artist details
-genre - Music genre classification
-employee - Employee hierarchy and information
-media_type - Audio format types
-playlist & playlist_track - Playlist management
-Additional supporting tables
+- customer - Customer information and demographics
+- invoice - Sales transaction records
+- invoice_line - Individual items in each transaction
+- track - Music track details
+- album - Album information
+- artist - Artist details
+- genre - Music genre classification
+- employee - Employee hierarchy and information
+- media_type - Audio format types
+- playlist & playlist_track - Playlist management
+- Additional supporting tables
 
 ```sql
 CREATE DATABASE sql_project_p1;
