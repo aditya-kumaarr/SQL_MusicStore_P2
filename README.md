@@ -27,31 +27,17 @@ The database contains 12 interconnected tables -
 	- customer - Customer information and demographics
 	- invoice - Sales transaction records
 	- invoice_line - Individual items in each transaction
-- track - Music track details
-- album - Album information
-- artist - Artist details
-- genre - Music genre classification
-- employee - Employee hierarchy and information
-- media_type - Audio format types
-- playlist & playlist_track - Playlist management
-- Additional supporting tables
+	- track - Music track details
+	- album - Album information
+	- artist - Artist details
+	- genre - Music genre classification
+	- employee - Employee hierarchy and information
+	- media_type - Audio format types
+	- playlist & playlist_track - Playlist management
+	- Additional supporting tables
 
 ```sql
 CREATE DATABASE sql_project_p1;
-
-CREATE TABLE sql_project_p1.retail_sales (
-    transactions_id INT PRIMARY KEY,
-    sale_date DATE,
-    sale_time TIME,
-    customer_id INT,
-    gender VARCHAR(15),
-    age INT,
-    category VARCHAR(15),
-    quantity INT,
-    price_per_unit FLOAT,
-    cogs FLOAT,
-    total_sale FLOAT
-);
 ```
 
 ### 2. Sample Data Preview, Data Exploration & Cleaning
