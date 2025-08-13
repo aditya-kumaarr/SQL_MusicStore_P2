@@ -40,49 +40,48 @@ The database contains 12 interconnected tables -
 CREATE DATABASE sql_project_p1;
 ```
 
-### 2. Sample Data Preview, Data Exploration & Cleaning
-
-- **Sample Data**: View first 10 rows of the dataset.
-- **Record Count**: Determine the total number of records in the dataset.
-- **Null Value Check**: Check for any null values in the dataset and delete records with missing data.
-- **Customer Count**: Find out how many unique customers are in the dataset.
-- **Category Count**: Identify all unique product categories in the dataset.
+### 2. Data Exploration Queries : Basic SELECT statements were executed on each table to understand -
+- Table structures and column names
+- Data types and constraints
+- Sample data for context
+- Relationships between tables for future JOIN operations
 
 ```sql
-SELECT 
-    *
-FROM
-    sql_project_p1.retail_sales
-LIMIT 10;
+SELECT *
+FROM album;
 
-SELECT 
-    COUNT(*)
-FROM
-    sql_project_p1.retail_sales;
+SELECT *
+FROM album2;
 
-SELECT 
-    *
-FROM
-    sql_project_p1.retail_sales
-WHERE
-    transactions_id IS NULL
-        OR sale_date IS NULL
-        OR sale_time IS NULL
-        OR gender IS NULL
-        OR category IS NULL
-        OR quantity IS NULL
-        OR cogs IS NULL
-        OR total_sale IS NULL;
+SELECT *
+FROM artist;
 
-SELECT 
-    COUNT(DISTINCT customer_id) AS total_sale
-FROM
-    sql_project_p1.retail_sales;
+SELECT *
+FROM customer;
 
-SELECT DISTINCT
-    category
-FROM
-    sql_project_p1.retail_sales;
+SELECT *
+FROM employee;
+
+SELECT *
+FROM genre;
+
+SELECT *
+FROM invoice;
+
+SELECT *
+FROM invoice_line;
+
+SELECT *
+FROM media_type;
+
+SELECT *
+FROM playlist;
+
+SELECT *
+FROM playlist_track;
+
+SELECT *
+FROM track;
 ```
 
 ### 3. Data Analysis & Key Business Problems with Solutions
