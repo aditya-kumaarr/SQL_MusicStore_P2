@@ -109,6 +109,20 @@ ON t.genre_id = g.genre_id
 WHERE t.genre_id = 1
 ORDER BY email;
 
+/* Q2: Let's invite the artists who have written the most rock music in our dataset. 
+Write a query that returns the Artist name and total track count of the top 10 rock bands. */
+SELECT art.name, COUNT(track_id) AS total_tracks
+FROM album AS al
+CROSS JOIN track AS t
+ON al.album_id = t.album_id
+CROSS JOIN genre AS g
+ON t.genre_id = g.genre_id
+CROSS JOIN artist AS art
+ON art.artist_id = al.album_id
+WHERE g.name = "Rock"
+GROUP BY art.name
+ORDER BY total_tracks DESC
+LIMIT 10;
 
 /*
 Q3: Return all the track names that have a song length longer than the average song length. 
@@ -168,8 +182,6 @@ Q3: Write a query that determines the customer that has spent the most on music 
 Write a query that returns the country along with the top customer and how much they spent. 
 For countries where the top amount spent is shared, provide all customers who spent this amount.
 */
-
-
 WITH most_money_spent AS 
 						( SELECT c.first_name, c.country, SUM(i.total) AS total_spent,
                         ROW_NUMBER() OVER (PARTITION BY first_name ORDER BY SUM(i.total) DESC) AS row_no
