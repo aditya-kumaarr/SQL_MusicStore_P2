@@ -88,155 +88,166 @@ FROM track;
 
 The following SQL queries were developed to answer specific business questions:
 
-1. **Retrieve all columns for sales made on '2022-11-05'**:
+1. **Who is the senior most employee based on job title?**:
 ```sql
-SELECT 
-    *
-FROM
-    sql_project_p1.retail_sales
-WHERE
-    sale_date = '2022-11-05';
+SELECT *
+FROM employee
+WHERE levels = (SELECT MAX(levels)
+				FROM employee);
 ```
 
-2. **Retrieve all transactions where the category is 'clothing' and the quantity sold is greater than or equal to 4 in the month of November 2022**:
+2. **Which countries have the most Invoices?**:
 ```sql
-SELECT 
-    *
-FROM
-    sql_project_p1.retail_sales
-WHERE
-    category = 'Clothing'
-        AND DATE_FORMAT(sale_date, '%Y-%m') = '2022-11'
-        AND quantity >= 4;
+SELECT billing_country, COUNT(billing_country) AS INVOICE_NO
+FROM invoice
+GROUP BY billing_country
+ORDER BY INVOICE_NO DESC
+LIMIT 1;
 ```
 
-3. **Calculate the total sales for each category**:
+3. **What are top 3 values of total invoice?**:
 ```sql
-SELECT 
-    category,
-    SUM(total_sale) AS net_sale,
-    COUNT(*) AS total_orders
-FROM
-    sql_project_p1.retail_sales
-GROUP BY 1;
+SELECT total
+FROM invoice
+ORDER BY total DESC
+LIMIT 3;
 ```
 
-4. **Find the average age of customers who purchased items from the 'beauty' category**:
+4. **Which city has the best customers? We would like to throw a promotional Music Festival in the city we made the most money. 
+Write a query that returns one city that has the highest sum of invoice totals. 
+Return both the city name & sum of all invoice totals**:
 ```sql
-SELECT 
-    ROUND(AVG(age)) AS avg_age
-FROM
-    sql_project_p1.retail_sales
-WHERE
-    category = 'Beauty';
+SELECT billing_country, SUM(total) AS total
+FROM invoice
+GROUP BY billing_country
+ORDER BY total DESC
+LIMIT 1;
 ```
 
-5. **Retrieve all transactions where the total_sale amount is greater than 1000**:
+5. **Who is the best customer? The customer who has spent the most money will be declared the best customer. 
+Write a query that returns the person who has spent the most money.**:
 ```sql
-SELECT 
-    *
-FROM
-    sql_project_p1.retail_sales
-WHERE
-    total_sale > 1000;
+SELECT c.first_name, SUM(i.total) AS total
+FROM invoice as i
+LEFT JOIN customer as c
+ON i.customer_id = c.customer_id
+GROUP BY first_name
+ORDER BY total DESC;
 ```
 
-6. **Count the total numbers of transactions made by each gender in each category**:
+6. **Write query to return the email, first name, last name, & Genre of all Rock Music listeners. 
+Return your list ordered alphabetically by email starting with A.**:
 ```sql
-SELECT 
-    category, gender, COUNT(*) AS total_trans
-FROM
-    sql_project_p1.retail_sales
-GROUP BY category , gender
-ORDER BY 1;
+SELECT DISTINCT c.email, c.first_name, c.last_name, g.name
+FROM track AS t
+CROSS JOIN invoice_line AS i
+ON i.track_id = t.track_id
+CROSS JOIN invoice
+ON i.invoice_id = invoice.invoice_id
+CROSS JOIN customer AS c
+ON invoice.customer_id = c.customer_id
+CROSS JOIN genre AS g
+ON t.genre_id = g.genre_id
+WHERE t.genre_id = 1
+ORDER BY email;
 ```
 
-7. **Calculate the average sales for each month and identify the best selling month in each year**:
+7. **Return all the track names that have a song length longer than the average song length. 
+Return the Name and Milliseconds for each track. Order by the song length with the longest songs listed first.**:
 ```sql
-SELECT 
-	year,
-    month,
-    avg_sale
-FROM (
-    SELECT
-        EXTRACT(YEAR FROM sale_date) AS year,
-        EXTRACT(MONTH FROM sale_date) AS month,
-        AVG(total_sale) AS avg_sale,
-        RANK() OVER (
-            PARTITION BY EXTRACT(YEAR FROM sale_date)
-            ORDER BY AVG(total_sale) DESC
-        ) AS rnk
-    FROM sql_project_p1.retail_sales
-    GROUP BY EXTRACT(YEAR FROM sale_date), EXTRACT(MONTH FROM sale_date)
-) AS t1
-WHERE rnk = 1;
+SELECT name, milliseconds
+FROM track
+WHERE milliseconds > (SELECT AVG(milliseconds)
+							FROM track)
+ORDER BY milliseconds DESC;
 ```
 
-8. **Retrieve the top 5 customers based on the highest total sales**:
+8. **Find how much amount spent by each customer on artists? Write a query to return customer name, artist name and total spent**:
 ```sql
-SELECT 
-    customer_id, SUM(total_sale) AS total_sales
-FROM
-    sql_project_p1.retail_sales
-GROUP BY 1
-ORDER BY 2 DESC
-LIMIT 5;
+SELECT c.first_name AS Customer_Name, SUM(i.total * quantity) AS total, art.name AS Artist_Name
+FROM customer AS c
+INNER JOIN invoice AS i
+ON c.customer_id = i.customer_id
+INNER JOIN invoice_line AS l
+ON i.invoice_id = l.invoice_id
+INNER JOIN track AS t
+ON l.track_id = t.track_id
+INNER JOIN album AS a
+ON t.album_id = a.album_id
+INNER JOIN artist AS art
+ON a.artist_id = art.artist_id
+GROUP BY Customer_Name,Artist_Name
+ORDER BY total DESC;
 ```
 
-9. **Find the number of unique customers who purchased items from each category**:
+9. **We want to find out the most popular music Genre for each country. We determine the most popular genre as the genre 
+with the highest amount of purchases. Write a query that returns each country along with the top Genre. For countries where 
+the maximum number of purchases is shared return all Genres.**:
 ```sql
-SELECT 
-    category, COUNT(DISTINCT customer_id) AS cnt_unique
-FROM
-    sql_project_p1.retail_sales
-GROUP BY category;
+WITH most_popular_genre AS 
+					( SELECT COUNT(l.quantity) AS top_purchases, c.country, g.name, g.genre_id,
+                      ROW_NUMBER() OVER (PARTITION BY c.country ORDER BY COUNT(l.quantity) DESC) AS row_no
+                      FROM invoice_line AS l
+                      INNER JOIN invoice AS i
+                      ON i.invoice_id = l.invoice_id
+                      INNER JOIN customer AS c
+                      ON i.customer_id = c.customer_id
+                      INNER JOIN track AS t
+                      ON t.track_id = l.track_id
+                      INNER JOIN genre AS g
+                      ON g.genre_id = t.genre_id
+                      GROUP BY 2,3,4
+                      ORDER BY 1 DESC, 2 ASC
+					)
+SELECT * FROM most_popular_genre WHERE row_no <= 1;
 ```
 
-10. **Create time based shifts (Morning, Afternoon, Evening) and count the number of orders in each shift**:
+10. **Write a query that determines the customer that has spent the most on music for each country. 
+Write a query that returns the country along with the top customer and how much they spent. 
+For countries where the top amount spent is shared, provide all customers who spent this amount.**:
 ```sql
-WITH hourly_sale
-AS
-(
-SELECT *,
-	CASE 
-		WHEN EXTRACT(HOUR FROM sale_time) < 12 THEN 'Morning'
-        WHEN EXTRACT(HOUR FROM sale_time) BETWEEN 12 AND 17 THEN 'Afternoon'
-        ELSE 'Evening'
-	END AS shift
-FROM sql_project_p1.retail_sales
-)
-SELECT
-	shift,
-    COUNT(*) as total_orders
-FROM hourly_sale
-GROUP BY shift
+WITH most_money_spent AS 
+						( SELECT c.first_name, c.country, SUM(i.total) AS total_spent,
+                        ROW_NUMBER() OVER (PARTITION BY first_name ORDER BY SUM(i.total) DESC) AS row_no
+                        FROM customer AS C
+                        INNER JOIN invoice AS i
+                        ON c.customer_id = i.invoice_id
+                        GROUP BY 1, 2
+                        ORDER BY 1 DESC, 2 ASC
+                        )
+SELECT * 
+FROM most_money_spent 
+WHERE row_no <= 1;
 ```
 
 ## Findings
 
-- **Customer Demographics**: The dataset includes customers from various age groups, with sales distributed across different categories such as Clothing and Beauty.
-- **High-Value Transactions**: Several transactions had a total sale amount greater than 1000, indicating premium purchases.
-- **Sales Trends**: Monthly analysis shows variations in sales, helping identify peak seasons.
-- **Customer Insights**: The analysis identifies the top-spending customers and the most popular product categories.
+- **Global Market Reach**: The dataset spans multiple countries with distinct purchasing patterns and genre preferences across different regions.
+- **Premium Customer Segments**: Analysis reveals high-value customers and transactions, enabling targeted VIP programs and personalized marketing strategies.
+- **Genre Performance**: Rock music shows strong customer engagement, with clear regional variations in music taste preferences.
+- **Artist Revenue Insights**: Detailed revenue attribution across artists provides strategic insights for partnership and royalty decisions.
+- **Content Strategy**: Track length analysis reveals premium content opportunities and pricing optimization potential.
 
 ## Reports
 
-- **Sales Summary**: A detailed report summarizing total sales, customer demographics, and category performance.
-- **Trend Analysis**: Insights into sales trends across different months and shifts.
-- **Customer Insights**: Reports on top customers and unique customer counts per category.
+- **Customer Demographics**: Comprehensive analysis of customer distribution across countries with spending behavior patterns.
+- **Genre Performance Dashboard**: Regional music preferences and genre popularity metrics for inventory optimization.
+- **Revenue Analytics**: Artist-wise revenue attribution and high-value transaction analysis for strategic decision-making.
+- **Organizational Insights**: Employee hierarchy analysis and management structure optimization recommendations.
 
 ## Conclusion
 
-A comprehensive SQL project involving database creation, data preprocessing, exploratory analysis, and performance-driven queries. This analysis helps businesses gain actionable insights into customer trends, sales performance, and category-wise product performance to optimize strategies and enhance decision-making.
+This comprehensive SQL project demonstrates advanced database management capabilities applied to music industry analytics. The analysis provides actionable insights into customer segmentation, regional market preferences, artist performance metrics, and revenue optimization strategies. The project showcases expertise in complex multi-table JOINs, window functions, CTEs, and strategic business intelligence that enables data-driven decision-making in the entertainment industry.
 
 ## How to Run the Project
 
-1.	Import the dataset into your SQL environment (MySQL/PostgreSQL).
-2.	Copy-paste the queries from sql_retail_sales_p1.sql into your SQL editor.
-3.	Run them one by one to see the results and tweak as needed.
-
+1.	Import the music store dataset into your SQL environment (MySQL/PostgreSQL).
+2.	Copy-paste the queries from sql_music_store_p2.sql into your SQL editor.
+3.	Execute the database creation script first, then run queries sequentially.
+4.	Analyze results and customize queries based on specific business requirements.
+5.	Use the insights to optimize inventory, marketing campaigns, and customer retention strategies.
 
 
 ## If you'd like to connect or collaborate on data projects, feel free to reach out on: 
-• **LinkedIn**: https://www.linkedin.com/in/aditya-kumar-4a175635b/
+• **LinkedIn**: www.linkedin.com/in/aditya-kumar-2852c
 • **Email**: adityaakumaarr@gmail.com
