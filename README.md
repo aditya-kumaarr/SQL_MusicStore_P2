@@ -152,7 +152,24 @@ WHERE t.genre_id = 1
 ORDER BY email;
 ```
 
-7. **Return all the track names that have a song length longer than the average song length. 
+7. **Let's invite the artists who have written the most rock music in our dataset. 
+Write a query that returns the Artist name and total track count of the top 10 rock bands..**:
+```sql
+SELECT art.name, COUNT(track_id) AS total_tracks
+FROM album AS al
+CROSS JOIN track AS t
+ON al.album_id = t.album_id
+CROSS JOIN genre AS g
+ON t.genre_id = g.genre_id
+CROSS JOIN artist AS art
+ON art.artist_id = al.album_id
+WHERE g.name = "Rock"
+GROUP BY art.name
+ORDER BY total_tracks DESC
+LIMIT 10;
+```
+
+8. **Return all the track names that have a song length longer than the average song length. 
 Return the Name and Milliseconds for each track. Order by the song length with the longest songs listed first.**:
 ```sql
 SELECT name, milliseconds
@@ -162,7 +179,7 @@ WHERE milliseconds > (SELECT AVG(milliseconds)
 ORDER BY milliseconds DESC;
 ```
 
-8. **Find how much amount spent by each customer on artists? Write a query to return customer name, artist name and total spent**:
+9. **Find how much amount spent by each customer on artists? Write a query to return customer name, artist name and total spent**:
 ```sql
 SELECT c.first_name AS Customer_Name, SUM(i.total * quantity) AS total, art.name AS Artist_Name
 FROM customer AS c
@@ -180,7 +197,7 @@ GROUP BY Customer_Name,Artist_Name
 ORDER BY total DESC;
 ```
 
-9. **We want to find out the most popular music Genre for each country. We determine the most popular genre as the genre 
+10. **We want to find out the most popular music Genre for each country. We determine the most popular genre as the genre 
 with the highest amount of purchases. Write a query that returns each country along with the top Genre. For countries where 
 the maximum number of purchases is shared return all Genres.**:
 ```sql
@@ -202,7 +219,7 @@ WITH most_popular_genre AS
 SELECT * FROM most_popular_genre WHERE row_no <= 1;
 ```
 
-10. **Write a query that determines the customer that has spent the most on music for each country. 
+11. **Write a query that determines the customer that has spent the most on music for each country. 
 Write a query that returns the country along with the top customer and how much they spent. 
 For countries where the top amount spent is shared, provide all customers who spent this amount.**:
 ```sql
